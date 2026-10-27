@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://c3ycgjykrtmx1"]
+
+[ext_resource type="Texture2D" uid="uid://dd6xplqbtwglh" path="res://img/sprites/characters/joanie.png" id="1_3vyb7"]
+[ext_resource type="Script" uid="uid://cx88cwbqvxjwd" path="res://scripts/player/player_controller.gd" id="2_g2els"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u3c5n"]
+size = Vector2(11, 26)
+
+[node name="Player" type="CharacterBody2D" unique_id=1692698449]
+script = ExtResource("2_g2els")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1917346785]
+zoom = Vector2(2, 2)
+position_smoothing_enabled = true
+
+[node name="AgentAnimator" type="Node2D" parent="." unique_id=1609260487]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="AgentAnimator" unique_id=1443659389]
+root_node = NodePath("../..")
+
+[node name="Sprite2D" type="Sprite2D" parent="AgentAnimator" unique_id=840914782]
+position = Vector2(0, -15)
+texture = ExtResource("1_3vyb7")
+region_enabled = true
+region_rect = Rect2(0, 0, 32, 32)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1059560617]
+position = Vector2(0.5, -13)
+shape = SubResource("RectangleShape2D_u3c5n")
