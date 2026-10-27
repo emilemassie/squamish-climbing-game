@@ -3,6 +3,24 @@
 [ext_resource type="Texture2D" uid="uid://dd6xplqbtwglh" path="res://img/sprites/characters/joanie.png" id="1_3vyb7"]
 [ext_resource type="Script" uid="uid://cx88cwbqvxjwd" path="res://scripts/player/player_controller.gd" id="2_g2els"]
 
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_g2els"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_u3c5n"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_3vyb7")
+}],
+"loop": 1,
+"name": &"player_idle",
+"speed": 10.0
+}]
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_u3c5n"]
 size = Vector2(11, 26)
 
@@ -17,13 +35,21 @@ position_smoothing_enabled = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="AgentAnimator" unique_id=1443659389]
 root_node = NodePath("../..")
+libraries/ = SubResource("AnimationLibrary_g2els")
 
-[node name="Sprite2D" type="Sprite2D" parent="AgentAnimator" unique_id=840914782]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="AgentAnimator" unique_id=227804808]
+z_index = 10
 position = Vector2(0, -15)
-texture = ExtResource("1_3vyb7")
-region_enabled = true
-region_rect = Rect2(0, 0, 32, 32)
+sprite_frames = SubResource("SpriteFrames_u3c5n")
+animation = &"player_idle"
+autoplay = "player_idle"
+frame_progress = 0.60537463
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1059560617]
 position = Vector2(0.5, -13)
 shape = SubResource("RectangleShape2D_u3c5n")
+
+[node name="climb_cast" type="RayCast2D" parent="." unique_id=596636430]
+target_position = Vector2(0, -35)
+collision_mask = 2
+hit_from_inside = true
