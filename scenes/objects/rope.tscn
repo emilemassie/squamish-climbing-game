@@ -4,32 +4,34 @@
 [ext_resource type="Texture2D" uid="uid://dcnvk853j6nda" path="res://img/sprites/objects/rope/anchor_2.png" id="2_jg5ub"]
 [ext_resource type="Texture2D" uid="uid://dpilvnbs41m2g" path="res://img/sprites/objects/rope/rope_end_2.png" id="4_ogrm4"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_aci2e"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u3c5n"]
+size = Vector2(6, 2)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ktnb2"]
+radius = 1.0
 
 [node name="rope" type="Node2D" unique_id=400625920]
 script = ExtResource("1_jg5ub")
 
 [node name="anchor" type="StaticBody2D" parent="." unique_id=2089667809]
 collision_layer = 16
+collision_mask = 16
 
 [node name="Anchor" type="Sprite2D" parent="anchor" unique_id=289546163]
 position = Vector2(0, -4)
 texture = ExtResource("2_jg5ub")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="anchor" unique_id=1059200461]
-position = Vector2(0, -7)
-scale = Vector2(0.69, 0.69)
-shape = SubResource("CircleShape2D_aci2e")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="anchor" unique_id=689037949]
+position = Vector2(0, -3)
+shape = SubResource("RectangleShape2D_u3c5n")
 
 [node name="end_part" type="RigidBody2D" parent="." unique_id=1204922503]
 position = Vector2(0, 4)
 collision_layer = 16
+collision_mask = 16
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="end_part" unique_id=1510074156]
-position = Vector2(0, 7)
-scale = Vector2(0.25, 0.25)
+position = Vector2(0, 6)
 shape = SubResource("CircleShape2D_ktnb2")
 
 [node name="RopeEnd" type="Sprite2D" parent="end_part" unique_id=1032967015]

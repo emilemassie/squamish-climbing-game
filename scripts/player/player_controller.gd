@@ -1,12 +1,23 @@
 extends CharacterBody2D
 @onready var animation: AnimatedSprite2D = $AgentAnimator/AnimatedSprite2D
 @onready var climb_cast: RayCast2D = $climb_cast
+@onready var rope_interactor: StaticBody2D = $RopeInteractor
+
+
+
+
 
 
 const SPEED = 100.0
 const JUMP_VELOCITY = -200.0
 const MAX_HEIGHT = 1000
 
+
+func _ready() -> void:
+	pass
+	#rope_interactor.collision_layer = 16
+	#rope_interactor.collision_mask = 16
+	rope_interactor
 
 func _physics_process(delta: float) -> void:
 	
@@ -16,6 +27,7 @@ func _physics_process(delta: float) -> void:
 	
 	_set_animation()
 	move_and_slide()
+	
 	
 func _climb_handler(delta) -> void:
 	var direction := Vector2.ZERO

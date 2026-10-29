@@ -12,7 +12,6 @@
 [ext_resource type="Texture2D" uid="uid://dpilvnbs41m2g" path="res://img/sprites/objects/rope/rope_end_2.png" id="10_qvmym"]
 [ext_resource type="Texture2D" uid="uid://nkd4vt03y5fi" path="res://img/sprites/objects/rope/rope_texture_3.png" id="11_6xcfc"]
 [ext_resource type="Texture2D" uid="uid://dcnvk853j6nda" path="res://img/sprites/objects/rope/anchor_2.png" id="12_qvmym"]
-[ext_resource type="Texture2D" uid="uid://buvvg3hpk1u7x" path="res://img/sprites/objects/rope/rope_texture_2.png" id="13_6xcfc"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_u5cog"]
 texture = ExtResource("2_tx3rw")
@@ -4246,7 +4245,7 @@ texture_region_size = Vector2i(32, 32)
 
 [sub_resource type="TileSet" id="TileSet_ktnb2"]
 tile_size = Vector2i(32, 32)
-physics_layer_0/collision_layer = 1
+physics_layer_0/collision_layer = 17
 physics_layer_0/physics_material = SubResource("PhysicsMaterial_tx3rw")
 physics_layer_1/collision_layer = 2
 physics_layer_1/collision_mask = 2
@@ -6457,30 +6456,28 @@ physics_quadrant_size = 32
 
 [node name="rope" parent="." unique_id=400625920 instance=ExtResource("9_kx7f0")]
 z_index = 5
-position = Vector2(20, -171)
-segment_thickness = 4.0
-rope_end_texture = ExtResource("10_qvmym")
-texture = ExtResource("11_6xcfc")
+position = Vector2(20, -71)
 anchor_texture = ExtResource("12_qvmym")
+texture = ExtResource("11_6xcfc")
+rope_end_texture = ExtResource("10_qvmym")
 
 [node name="rope_line" type="Line2D" parent="rope" unique_id=1218492817]
 position = Vector2(0, -3)
 points = PackedVector2Array(0, 0, 0, 19, 0, 33, 0, 43, 0, 54, 0, 66)
-width = 2.0
-texture = ExtResource("13_6xcfc")
+width = 4.0
+texture = ExtResource("11_6xcfc")
 texture_mode = 1
 
 [node name="rope2" parent="." unique_id=1067068506 instance=ExtResource("9_kx7f0")]
 z_index = 5
 position = Vector2(84, -135)
-segment_thickness = 4.0
-rope_end_texture = ExtResource("10_qvmym")
-texture = ExtResource("11_6xcfc")
 anchor_texture = ExtResource("12_qvmym")
+texture = ExtResource("11_6xcfc")
+rope_end_texture = ExtResource("10_qvmym")
 
 [node name="rope_line" type="Line2D" parent="rope2" unique_id=1976683496]
 position = Vector2(0, -3)
 points = PackedVector2Array(0, 0, 0, 19, 0, 33, 0, 43, 0, 54, 0, 66, 0, 79, 0, 92, 0, 107)
-width = 2.0
-texture = ExtResource("13_6xcfc")
+width = 4.0
+texture = ExtResource("11_6xcfc")
 texture_mode = 1

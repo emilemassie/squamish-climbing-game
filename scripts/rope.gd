@@ -1,10 +1,13 @@
 extends Node2D
 
-@export var segment_thickness: float = 2.0 # Collision radius/width for the rope
-@export var softness: float = 0.25
-@export var rope_end_texture: Texture2D
-@export var texture: Texture2D
+#@export var segment_length_target: float = 12.0 # INCREASED: 12-20px prevents solver overload     # Collision radius for circles
+@export var softness: float = 0.0               # CHANGED: 0.0 makes joints rigid, preventing stretch
+@export var rope_thinkness: int = 4
+var segment_thickness = rope_thinkness
+var segment_length_target = rope_thinkness*2
 @export var anchor_texture: Texture2D
+@export var texture: Texture2D
+@export var rope_end_texture: Texture2D
 
 @onready var rope_line: Line2D = $rope_line
 @onready var anchor: StaticBody2D = $anchor
@@ -15,66 +18,58 @@ extends Node2D
 var rope_segments: Array[RigidBody2D] = []
 
 func _ready() -> void:
-	rope_line.width = int(segment_thickness)
-	#rope_line.default_color = Color(0.851, 0.627, 0.4, 1.0) # Bright red for high visibility
-	#rope_line.z_index = 100
-	
+	rope_line.width = int(rope_thinkness)
 	anchor_sprite.texture = anchor_texture
 	rope_end_sprite.texture = rope_end_texture
 	rope_line.texture = texture
 	
-	
-	var points = rope_line.points
-	var total_points: int = points.size()
-	
-	if total_points < 2:
-		push_warning("Line2D needs at least 2 points to build a rope.")
+	# Step 1: Resample original Line2D points for uniform spacing
+	var resampled_points: PackedVector2Array = _resample_points(rope_line.points, segment_length_target)
+	if resampled_points.size() < 2:
+		push_warning("Line2D path is too short to generate rope segments.")
 		return
 
-	# Step 1: Create RigidBody2D segments between each pair of points
-	for i in range(total_points - 1):
-		var p_start: Vector2 = rope_line.to_global(points[i])
-		var p_end: Vector2 = rope_line.to_global(points[i + 1])
-		var segment_center: Vector2 = (p_start + p_end) / 2.0
-		var segment_vector: Vector2 = p_end - p_start
-		var segment_length: float = segment_vector.length()
+	rope_line.points = resampled_points
+	var total_points: int = resampled_points.size()
 
-		# Create RigidBody2D segment using global_position
+	# Step 2: Create RigidBody2D segments with CircleShape2D
+	for i in range(total_points - 1):
+		var p_start: Vector2 = rope_line.to_global(resampled_points[i])
+		var p_end: Vector2 = rope_line.to_global(resampled_points[i + 1])
+		var segment_center: Vector2 = (p_start + p_end) / 2.0
+
 		var segment = RigidBody2D.new()
+		segment.collision_layer = 16
+		segment.collision_mask = 16
 		
-		segment.collision_layer = 5
-		
-		segment.mass = 0.05                             # Reduce weight (default is 1.0)
-		#segment.gravity_scale = 1.0                     # Keep natural gravity drop
-		#segment.linear_damp = 2.0                       # Dampen swinging to prevent aggressive spastic movement
+		# Mass, damping, and solver settings for stability
+		segment.mass = 0.25
+		#segment.linear_damp = 3
 		#segment.angular_damp = 2.0
-		#segment.continuous_cd = RigidBody2D.CCD_MODE_CAST_RAY # Prevents light fast objects from passing through colliders
-				
+		segment.can_sleep = false # Keeps joint constraint solver active
 		
-		
-		add_child(segment) # Add child FIRST so global_position resolves accurately
+		add_child(segment)
 		segment.global_position = segment_center
-		segment.rotation = segment_vector.angle()
+		segment.rotation = (p_end - p_start).angle()
 		segment.add_to_group("rope_segments")
 		rope_segments.append(segment)
 
-		# Create CapsuleCollisionShape2D for the segment
 		var col = CollisionShape2D.new()
-		var shape = CapsuleShape2D.new()
+		var shape = CircleShape2D.new()
 		shape.radius = segment_thickness
-		shape.height = max(segment_length, segment_thickness * 2.0) # Height must be >= 2 * radius
 		col.shape = shape
-		col.rotation = Vector2.RIGHT.angle_to(Vector2.DOWN) # Orient capsule along segment
 		segment.add_child(col)
 
-	# Step 2: Connect Anchor -> Segments -> End Part using PinJoint2D at every vertex
+	# Step 3: Pin joints between anchor, segments, and end_part
 	for i in range(total_points):
-		var joint_pos: Vector2 = rope_line.to_global(points[i])
+		var joint_pos: Vector2 = rope_line.to_global(resampled_points[i])
 		var joint = PinJoint2D.new()
+		
+		# Set softness near 0 to remove rubber-band stretching
 		joint.softness = softness
 		joint.disable_collision = true
-		add_child(joint) # Add child FIRST
-		joint.global_position = joint_pos # Use global_position instead of local position
+		add_child(joint)
+		joint.global_position = joint_pos
 		joint.add_to_group("rope_joints")
 
 		if i == 0:
@@ -88,28 +83,57 @@ func _ready() -> void:
 			joint.node_a = rope_segments[i - 1].get_path()
 			joint.node_b = rope_segments[i].get_path()
 			
-	end_part.mass = .2
-	#end_part.angular_damp = 5
+	end_part.mass = 0.2
+	end_part.linear_damp = 1.5
+	end_part.angular_damp = 2.0
 
 func _process(_delta: float) -> void:
-	if rope_segments.size() > 0:
-		# Point 0 is pinned to anchor
-		rope_line.set_point_position(0, rope_line.to_local(anchor.global_position))
+	if rope_segments.is_empty():
+		return
+
+	# Point 0 locked to anchor
+	rope_line.set_point_position(0, rope_line.to_local(anchor.global_position))
+	
+	# Correctly track segment body positions directly
+	for i in range(rope_segments.size()):
+		rope_line.set_point_position(i + 1, rope_line.to_local(rope_segments[i].global_position))
 		
-		# Intermediate points track joint locations between segments
-		for i in range(rope_segments.size() - 1):
-			var joint_pos: Vector2 = (rope_segments[i].global_position + rope_segments[i + 1].global_position) / 2.0
-			rope_line.set_point_position(i + 1, rope_line.to_local(joint_pos))
+	# Last point locked to end_part
+	rope_line.set_point_position(rope_line.points.size() - 1, rope_line.to_local(end_part.global_position))
+
+# Resamples an array of points using arc-length parameterization
+func _resample_points(raw_points: PackedVector2Array, spacing: float) -> PackedVector2Array:
+	if raw_points.size() < 2:
+		return raw_points
+
+	var new_points: PackedVector2Array = [raw_points[0]]
+	var accumulated_dist: float = 0.0
+
+	var i: int = 0
+	while i < raw_points.size() - 1:
+		var p_start: Vector2 = raw_points[i]
+		var p_end: Vector2 = raw_points[i + 1]
+		var segment_dist: float = p_start.distance_to(p_end)
+
+		if segment_dist == 0.0:
+			i += 1
+			continue
+
+		if accumulated_dist + segment_dist >= spacing:
+			var remaining: float = spacing - accumulated_dist
+			var direction: Vector2 = (p_end - p_start).normalized()
+			var next_point: Vector2 = p_start + direction * remaining
 			
-		# Last point tracks end_part
-		rope_line.set_point_position(rope_line.points.size() - 1, rope_line.to_local(end_part.global_position))
+			new_points.append(next_point)
+			raw_points[i] = next_point
+			accumulated_dist = 0.0
+		else:
+			accumulated_dist += segment_dist
+			i += 1
 
-	queue_redraw()
+	if new_points[new_points.size() - 1].distance_to(raw_points[raw_points.size() - 1]) > spacing * 0.5:
+		new_points.append(raw_points[raw_points.size() - 1])
+	else:
+		new_points[new_points.size() - 1] = raw_points[raw_points.size() - 1]
 
-#func _draw() -> void:
-
-	# Convert Line2D local positions into this Node2D's local coordinate space
-	#for point in rope_line.points:
-	#	var global_p: Vector2 = rope_line.to_global(point)
-	#	var local_p: Vector2 = to_local(global_p)
-	#	draw_circle(local_p, 4.0, Color.GREEN)
+	return new_points

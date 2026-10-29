@@ -22,7 +22,11 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_u3c5n"]
-size = Vector2(11, 26)
+size = Vector2(9, 26)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g2els"]
+radius = 5.0
+height = 16.0
 
 [node name="Player" type="CharacterBody2D" unique_id=1692698449]
 script = ExtResource("2_g2els")
@@ -53,3 +57,13 @@ shape = SubResource("RectangleShape2D_u3c5n")
 target_position = Vector2(0, -35)
 collision_mask = 2
 hit_from_inside = true
+
+[node name="RopeInteractor" type="StaticBody2D" parent="." unique_id=1419358519]
+z_index = 100
+position = Vector2(0, -8)
+collision_layer = 16
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RopeInteractor" unique_id=1238100597]
+shape = SubResource("CapsuleShape2D_g2els")
+debug_color = Color(0.7698686, 0.4455753, 3.85046e-07, 0.41960785)
