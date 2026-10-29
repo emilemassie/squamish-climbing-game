@@ -8,6 +8,11 @@
 [ext_resource type="Texture2D" uid="uid://ie8civeqks2" path="res://img/sprites/ui/heart_32x32.png" id="6_kx7f0"]
 [ext_resource type="Script" uid="uid://coel8t8dxufo3" path="res://scripts/ui/fear_bar.gd" id="6_u5cog"]
 [ext_resource type="Texture2D" uid="uid://dpgof12f3ddar" path="res://img/sprites/ui/fear.png" id="7_jw5aa"]
+[ext_resource type="PackedScene" uid="uid://c7va5pcexxe78" path="res://scenes/objects/rope.tscn" id="9_kx7f0"]
+[ext_resource type="Texture2D" uid="uid://dpilvnbs41m2g" path="res://img/sprites/objects/rope/rope_end_2.png" id="10_qvmym"]
+[ext_resource type="Texture2D" uid="uid://nkd4vt03y5fi" path="res://img/sprites/objects/rope/rope_texture_3.png" id="11_6xcfc"]
+[ext_resource type="Texture2D" uid="uid://dcnvk853j6nda" path="res://img/sprites/objects/rope/anchor_2.png" id="12_qvmym"]
+[ext_resource type="Texture2D" uid="uid://buvvg3hpk1u7x" path="res://img/sprites/objects/rope/rope_texture_2.png" id="13_6xcfc"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_u5cog"]
 texture = ExtResource("2_tx3rw")
@@ -6449,3 +6454,33 @@ tile_map_data = PackedByteArray("AAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAAAAAAAAA
 tile_set = SubResource("TileSet_kx7f0")
 rendering_quadrant_size = 32
 physics_quadrant_size = 32
+
+[node name="rope" parent="." unique_id=400625920 instance=ExtResource("9_kx7f0")]
+z_index = 5
+position = Vector2(20, -171)
+segment_thickness = 4.0
+rope_end_texture = ExtResource("10_qvmym")
+texture = ExtResource("11_6xcfc")
+anchor_texture = ExtResource("12_qvmym")
+
+[node name="rope_line" type="Line2D" parent="rope" unique_id=1218492817]
+position = Vector2(0, -3)
+points = PackedVector2Array(0, 0, 0, 19, 0, 33, 0, 43, 0, 54, 0, 66)
+width = 2.0
+texture = ExtResource("13_6xcfc")
+texture_mode = 1
+
+[node name="rope2" parent="." unique_id=1067068506 instance=ExtResource("9_kx7f0")]
+z_index = 5
+position = Vector2(84, -135)
+segment_thickness = 4.0
+rope_end_texture = ExtResource("10_qvmym")
+texture = ExtResource("11_6xcfc")
+anchor_texture = ExtResource("12_qvmym")
+
+[node name="rope_line" type="Line2D" parent="rope2" unique_id=1976683496]
+position = Vector2(0, -3)
+points = PackedVector2Array(0, 0, 0, 19, 0, 33, 0, 43, 0, 54, 0, 66, 0, 79, 0, 92, 0, 107)
+width = 2.0
+texture = ExtResource("13_6xcfc")
+texture_mode = 1
